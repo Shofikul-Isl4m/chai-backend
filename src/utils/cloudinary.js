@@ -1,4 +1,5 @@
 import {v2 as cloudinary} from "cloudinary"
+import {extractPublicId} from "cloudinary-build-url"
 import fs from "fs"
 
 
@@ -26,6 +27,29 @@ const uploadOnCloudinary = async (localFilePath) => {
     }
 }
 
+const deleteFromCloudinary = async (publicId) => {
+    try {
+        if (!publicId) return null;
+
+        // Step 1: Get resource details to identify resource type
+        const resourceInfo = await cloudinary.api.resource(publicId);
+        const resourceType = resourceInfo.resource_type; // This can be 'image', 'video', or 'raw'
+
+        // Step 2: Delete the file with the identified resource type
+        const response = await cloudinary.uploader.destroy(publicId, { resource_type: resourceType });
+
+        
+        
+        return response;
+    } catch (error) {
+        console.error("Error managing file on Cloudinary:", error);
+        return null;
+    }
+};
 
 
-export {uploadOnCloudinary}
+
+export {
+    uploadOnCloudinary,
+    deleteInCloudinary
+}
